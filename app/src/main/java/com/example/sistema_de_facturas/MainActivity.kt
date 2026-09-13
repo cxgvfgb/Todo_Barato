@@ -7,6 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sistema_de_facturas.adapter.SalesAdapter
 import com.example.sistema_de_facturas.model.Sale
 import com.example.sistema_de_facturas.repository.SalesRepository
 import com.example.sistema_de_facturas.util.SaleValidator
@@ -15,6 +18,8 @@ import com.example.sistema_de_facturas.util.ValidationResult
 class MainActivity : AppCompatActivity() {
 
     private lateinit var salesRepository: SalesRepository
+    private lateinit var salesAdapter: SalesAdapter
+    private lateinit var rvSales: RecyclerView
     private val tag = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +39,13 @@ class MainActivity : AppCompatActivity() {
         // Initialize repository
         salesRepository = SalesRepository(this)
 
+        // Bind RecyclerView component
+        rvSales = findViewById(R.id.rvSales)
+        rvSales.layoutManager = LinearLayoutManager(this)
+        
+        salesAdapter = SalesAdapter(emptyList())
+        rvSales.adapter = salesAdapter
+
         // Load all sales initially into the interface
         loadSalesIntoUI()
     }
@@ -46,11 +58,12 @@ class MainActivity : AppCompatActivity() {
         Log.i(tag, "Loading sales into main screen")
         val allSales = salesRepository.getAllSales()
         
+        // Update adapter list
+        salesAdapter.updateData(allSales)
+        
         // Calculate total sales dynamically from actual data
         val totalAmount = allSales.sumOf { it.total }
         Log.i(tag, "Total calculated sales amount: $totalAmount")
-        
-        // TODO: UI Developer can hook their adapter or list viewer here using allSales list
     }
 
     /**
